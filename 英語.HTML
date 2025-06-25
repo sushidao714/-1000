@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALUE1000 単語クイズ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input {
+            font-size: 18px;
+            padding: 5px;
+        }
+        button {
+            font-size: 18px;
+            padding: 5px 10px;
+            margin-top: 10px;
+            display: none; /* 最初は非表示 */
+        }
+        #result {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>英語単語クイズ</h1>
+    <div id="question">問題がここに表示されます</div>
+    <input type="text" id="answer" placeholder="答えを入力">
+    <div id="result"></div>
+    <button id="nextBtn" onclick="nextQuestion()">次の問題</button>
+
+    <script>
+        const words = [
+        { question: "贈り物", answer: "gift" },
+            { question: "音", answer: "noises" },
+            { question: "簡単に", answer: "easily" },
+            { question: "ついに", answer: "finally" },
+            { question: "まったく", answer: "quite" },
+            { question: "主に", answer: "mainly" },
+            { question: "ほとんど", answer: "Almost" },
+            { question: "危うく", answer: "nearly" },
+            { question: "まったく", answer: "exactiy" },
+            { question: "静かに", answer: "quietly" },
+            { question: "~に思えた", answer: "seemed" },
+            { question: "=が好きだ", answer: "prefer" },
+            { question: "~が嫌いだ", answer: "hates" },
+            { question: "~を信じる", answer: "believe" },
+            { question: "~を忘れる", answer: "forget" },
+            { question: "驚いた", answer: "surprised" },
+            { question: "興奮した", answer: "excited" },
+            { question: "衝撃を受けた", answer: "shocked" },
+            { question: "怖い", answer: "scared" },
+            { question: "~を証明する", answer: "prove" },
+            { question: "~だろうか", answer: "wonder" },
+            { question: "期末", answer: "final" },
+            { question: "中央", answer: "central" },
+            { question: "たった1つの", answer: "single" },
+            { question: "可能だ", answer: "possible" },
+            { question: "不可能だ", answer: "impossible" },
+            { question: "警察(police)官", answer: "police officer" },
+            { question: "オーナー", answer: "owner" },
+            { question: "患者", answer: "patients" },
+            { question: "画家", answer: "artist" },
+            { question: "キャプテン", answer: "captain" },
+            { question: "子ども", answer: "kids" },
+            { question: "健康です 健康な", answer: "healthy" },
+            { question: "活動的な", answer: "active" },
+            { question: "生きている", answer: "alive" },
+            { question: "のどがカラカラ のどが渇いた", answer: "thirsty" },
+            { question: "深刻な", answer: "serious" },
+            { question: "正しい", answer: "correct" },
+            { question: "いつも", answer: "usual" },
+            { question: "とてもおいしい", answer: "delicious" },
+            { question: "高価だ", answer: "expensive" },
+            { question: "あいている", answer: "empty" },
+            { question: "混雑した", answer: "crowded" },
+            { question: "似ている", answer: "similar" },
+            { question: "きっと 確かに 90%以上確信", answer: "certainly" },
+            { question: "きっと 絶対に 100%確信", answer: "surely" },
+            { question: "おそらく", answer: "probably" },
+            { question: "たぶん", answer: "Maybe" },
+            { question: "おそらく", answer: "Perhaps" },
+            { question: "ふるまった", answer: "acted" },
+            { question: "~を練習した", answer: "practiced" },
+            { question: "喫煙している", answer: "smoking" },
+            { question: "隠れた", answer: "hid" },
+            { question: "~を~につないだ ネクタイ", answer: "tied" },
+            { question: "を掘った", answer: "dug" },
+        ];
+
+        let wordPool = []; // 出題用のシャッフル済みリスト
+        let currentWord = {};
+        let answered = false;
+
+        // 全単語をシャッフル
+        function shuffleWords() {
+            wordPool = [...words];
+            for (let i = wordPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [wordPool[i], wordPool[j]] = [wordPool[j], wordPool[i]];
+            }
+        }
+
+        // 新しい問題を出す
+        function nextQuestion() {
+            if (wordPool.length === 0) {
+                shuffleWords(); // すべて出題したらリセット
+            }
+
+            currentWord = wordPool.pop(); // シャッフル済みリストから1つ取り出す
+            document.getElementById("question").textContent = `【問題】${currentWord.question} 英語は？`;
+            document.getElementById("answer").value = "";
+            document.getElementById("result").textContent = "";
+            document.getElementById("nextBtn").style.display = "none";
+            document.getElementById("answer").focus();
+            answered = false;
+        }
+
+        // 回答チェック
+        function checkAnswer() {
+            if (answered) {
+                nextQuestion();
+                return;
+            }
+
+            const userAnswer = document.getElementById("answer").value.trim();
+            const resultDiv = document.getElementById("result");
+
+            if (userAnswer.toLowerCase() === currentWord.answer.toLowerCase()) {
+                resultDiv.textContent = "✅ 正解！";
+                resultDiv.style.color = "green";
+            } else {
+                resultDiv.textContent = `❌ 不正解… 正解は「${currentWord.answer}」`;
+                resultDiv.style.color = "red";
+            }
+
+            document.getElementById("nextBtn").style.display = "block";
+            answered = true;
+        }
+
+        // エンターキーで回答 or 次の問題へ
+        document.getElementById("answer").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
+
+        // 初回セットアップ
+        shuffleWords();
+        nextQuestion();
+    </script>
+</body>
+</html>

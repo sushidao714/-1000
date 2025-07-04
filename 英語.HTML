@@ -22,7 +22,7 @@
             font-size: 18px;
             padding: 5px 10px;
             margin-top: 10px;
-            display: none; /* 最初は非表示 */
+            display: none;
         }
         #result {
             font-size: 20px;
@@ -43,14 +43,14 @@
             { question: "音", answer: "noises" },
             { question: "簡単に", answer: "easily" },
             { question: "ついに", answer: "finally" },
-            { question: "まったく", answer: "quite" },
+            { question: "まったく、完全に (柔らかく強調したい時に使う)", answer: "quite" },
             { question: "主に", answer: "mainly" },
             { question: "ほとんど", answer: "Almost" },
             { question: "危うく", answer: "nearly" },
-            { question: "まったく", answer: "exactiy" },
+            { question: "まったく、完全に (ピタッと断言したい時に使う)", answer: "exactly" },
             { question: "静かに", answer: "quietly" },
             { question: "~に思えた", answer: "seemed" },
-            { question: "=が好きだ", answer: "prefer" },
+            { question: "～のほうを好む", answer: "prefer" },
             { question: "~が嫌いだ", answer: "hates" },
             { question: "~を信じる", answer: "believe" },
             { question: "~を忘れる", answer: "forget" },
@@ -85,9 +85,9 @@
             { question: "似ている", answer: "similar" },
             { question: "きっと 確かに 90%以上確信", answer: "certainly" },
             { question: "きっと 絶対に 100%確信", answer: "surely" },
-            { question: "おそらく", answer: "probably" },
+            { question: "おそらく (70～90％)", answer: "probably" },
             { question: "たぶん", answer: "Maybe" },
-            { question: "おそらく", answer: "Perhaps" },
+            { question: "おそらく (30～50％)", answer: "Perhaps" },
             { question: "ふるまった", answer: "acted" },
             { question: "~を練習した", answer: "practiced" },
             { question: "喫煙している", answer: "smoking" },
@@ -96,11 +96,10 @@
             { question: "を掘った", answer: "dug" },
         ];
 
-        let wordPool = []; // 出題用のシャッフル済みリスト
+        let wordPool = [];
         let currentWord = {};
         let answered = false;
 
-        // 全単語をシャッフル
         function shuffleWords() {
             wordPool = [...words];
             for (let i = wordPool.length - 1; i > 0; i--) {
@@ -109,13 +108,12 @@
             }
         }
 
-        // 新しい問題を出す
         function nextQuestion() {
             if (wordPool.length === 0) {
-                shuffleWords(); // すべて出題したらリセット
+                shuffleWords();
             }
 
-            currentWord = wordPool.pop(); // シャッフル済みリストから1つ取り出す
+            currentWord = wordPool.pop();
             document.getElementById("question").textContent = `【問題】${currentWord.question} 英語は？`;
             document.getElementById("answer").value = "";
             document.getElementById("result").textContent = "";
@@ -124,12 +122,8 @@
             answered = false;
         }
 
-        // 回答チェック
         function checkAnswer() {
-            if (answered) {
-                nextQuestion();
-                return;
-            }
+            if (answered) return;
 
             const userAnswer = document.getElementById("answer").value.trim();
             const resultDiv = document.getElementById("result");
@@ -137,23 +131,27 @@
             if (userAnswer.toLowerCase() === currentWord.answer.toLowerCase()) {
                 resultDiv.textContent = "✅ 正解！";
                 resultDiv.style.color = "green";
+                document.getElementById("nextBtn").style.display = "block";
+                answered = true;
             } else {
-                resultDiv.textContent = `❌ 不正解… 正解は「${currentWord.answer}」`;
+                resultDiv.textContent = `❌ 不正解… 正解は「${currentWord.answer}」です。もう一度入力してね！`;
                 resultDiv.style.color = "red";
+                document.getElementById("nextBtn").style.display = "none";
+                document.getElementById("answer").focus();
+                document.getElementById("answer").select();
             }
-
-            document.getElementById("nextBtn").style.display = "block";
-            answered = true;
         }
 
-        // エンターキーで回答 or 次の問題へ
         document.getElementById("answer").addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
-                checkAnswer();
+                if (!answered) {
+                    checkAnswer();
+                } else {
+                    nextQuestion();
+                }
             }
         });
 
-        // 初回セットアップ
         shuffleWords();
         nextQuestion();
     </script>
